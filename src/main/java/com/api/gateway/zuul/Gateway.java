@@ -61,29 +61,50 @@ public class Gateway {
 
 	@GetMapping("/validate")
 	public String validateUser(@RequestParam String email, @RequestParam String password){
+		return this.validateInternal(email, password);
+	}
 
+
+	private String validateInternal(String email, String password){
 		String url = "http://" + URI + ":" + LOGIN_SERVICE_PORT + "/validate?email="
 				+ email + "&password=" + password;
-		String message = restTemplate.getForObject(url,String.class);
-		return message;
-
+		return restTemplate.getForObject(url,String.class);
 	}
 
 
 	@PostMapping("/addToCart")
-	public ResponseEntity<String> addToCart(@RequestBody Object cartRequest){
+	public ResponseEntity<String> addToCart(@RequestBody Object cartRequest,
+	                                        @RequestParam String email,
+	                                        @RequestParam String password){
 
-		String url = "http://" + URI + ":" + CART_SERVICE_PORT + "/addToCart";
-		return restTemplate.postForEntity(url, cartRequest, String.class);
+		String message = this.validateInternal(email, password);
+		ResponseEntity<String> responseMessage;
+		if (message.contains("successful")){
+			String url = "http://" + URI + ":" + CART_SERVICE_PORT + "/addToCart";
+			responseMessage = restTemplate.postForEntity(url, cartRequest, String.class);
+		}
+		else responseMessage = new ResponseEntity<String>("User Authentication failed!");
+
+		return responseMessage;
 
 	}
 
 
 	@PostMapping("/placeOrder")
-	public String addToCart(@RequestParam String userId){
+	public ResponseEntity<String> addToCart(@RequestParam String userId,
+	                        @RequestParam String email,
+		                    @RequestParam String password){
 
-		String url = "http://" + URI + ":" + CART_SERVICE_PORT + "/placeOrder?userId=" + userId;
-		return restTemplate.getForObject(url, String.class);
+
+		String message = this.validateInternal(email, password);
+		ResponseEntity<String> responseMessage;
+		if (message.contains("successful")){
+			String url = "http://" + URI + ":" + CART_SERVICE_PORT + "/placeOrder?userId=" + userId;
+			responseMessage = restTemplate.postForEntity(url, userId, String.class);
+		}
+		else responseMessage = new ResponseEntity<String>("User Authentication failed!");
+
+		return responseMessage;
 
 	}
 
