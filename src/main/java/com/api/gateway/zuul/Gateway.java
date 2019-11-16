@@ -9,6 +9,7 @@ package com.api.gateway.zuul;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,19 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
+@Component
 public class Gateway {
 
 	@Value("${server.URI}")
-	private static String URI;
+	private String URI;
 
 	@Value("${server.searchService.port}")
-	private static String SEARCH_SERVICE_PORT;
+	private String SEARCH_SERVICE_PORT;
 
 	@Value("${server.loginService.port}")
-	private static String LOGIN_SERVICE_PORT;
+	private String LOGIN_SERVICE_PORT;
 
 	@Value("${server.cartService.port}")
-	private static String CART_SERVICE_PORT;
+	private String CART_SERVICE_PORT;
 
 	@Bean
 	private RestTemplate getNewRestTemplate(){
@@ -50,10 +52,11 @@ public class Gateway {
 	@GetMapping("/search")
 	public Object searchMedicines(@RequestParam String query){
 
+		String url = "http://"+URI+":"+SEARCH_SERVICE_PORT+"search?medicine="+query;
+		System.out.println(url);
+		return restTemplate.getForObject(url,Object.class);
 
-		String url = URI+SEARCH_SERVICE_PORT+"/?query="+query;
-		
-		Object object = this.restTemplate.getForObject(URI+SEARCH_SERVICE_PORT,Object.class );
-		return object;
 	}
+
+	
 }
