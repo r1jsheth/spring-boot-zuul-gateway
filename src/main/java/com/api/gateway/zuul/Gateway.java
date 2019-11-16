@@ -6,9 +6,9 @@ package com.api.gateway.zuul;
  */
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ public class Gateway {
 		return new RestTemplate();
 	}
 
-	RestTemplate restTemplate;
+	private RestTemplate restTemplate;
 
 	public Gateway(){
 		this.restTemplate = getNewRestTemplate();
@@ -83,7 +83,9 @@ public class Gateway {
 			String url = "http://" + URI + ":" + CART_SERVICE_PORT + "/addToCart";
 			responseMessage = restTemplate.postForEntity(url, cartRequest, String.class);
 		}
-		else responseMessage = new ResponseEntity<String>("User Authentication failed!");
+		else {
+			responseMessage = new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
 
 		return responseMessage;
 
@@ -102,7 +104,7 @@ public class Gateway {
 			String url = "http://" + URI + ":" + CART_SERVICE_PORT + "/placeOrder?userId=" + userId;
 			responseMessage = restTemplate.postForEntity(url, userId, String.class);
 		}
-		else responseMessage = new ResponseEntity<String>("User Authentication failed!");
+		else responseMessage = new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
 		return responseMessage;
 
