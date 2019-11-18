@@ -44,7 +44,7 @@ public class Gateway {
 	@GetMapping("/search")
 	public Object searchMedicines(@RequestParam String query){
 
-		String url = "http://" + URI + ":" + SEARCH_SERVICE_PORT + "search?medicine=" + query;
+		String url = "http://" + URI + ":" + SEARCH_SERVICE_PORT + "/search?medicine=" + query;
 		System.out.println(url);
 		return restTemplate.getForObject(url,Object.class);
 
